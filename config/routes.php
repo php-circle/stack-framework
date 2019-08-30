@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 
-use PhpCircle\Framework\Application;
+use PhpCircle\Framework\Routing\RouterInterface;
 
-return static function (Application $app) {
-    /** @var \PhpCircle\Framework\Routing\RouterInterface $routes */
-    $routes = $app->router;
+return static function (RouterInterface $routes) {
 
-    $routes->get('/', 'UserController@index');
+    $routes->post('/user', App\Http\Handlers\UserHandler::class);
 };

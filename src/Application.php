@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace PhpCircle\Framework;
 
 use PhpCircle\Framework\Routing\Router;
+use Zend\Diactoros\ServerRequestFactory;
 
 class Application
 {
@@ -21,12 +22,17 @@ class Application
     }
 
     /**
-     * Description here
+     * Proposed implementation.
      *
      * @return void
      */
     public function run(): void
     {
-        dump('Application run...');
+        /** @var \Psr\Http\Message\ResponseInterface $handler */
+        $response = $this->router->handle(ServerRequestFactory::fromGlobals());
+
+        // Do something with the response.
+
+        echo $response->getBody();
     }
 }

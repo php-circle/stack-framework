@@ -6,7 +6,7 @@ use PhpCircle\Framework\Application;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (static function () {
-    // Instantiate application
+    // Create application instance.
     $app = new Application();
 
     /**
@@ -14,7 +14,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
      *
      * Set routes
      */
-    (require __DIR__ . '/../config/routes.php')($app);
+    (require __DIR__ . '/../config/routes.php')($app->router);
 
     $app->run();
 })();
