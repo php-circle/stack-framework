@@ -6,6 +6,11 @@ use PhpCircle\Framework\Application;
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (static function () {
+    // Here for now...
+    $whoops = new Whoops\Run;
+    $whoops->prependHandler(new Whoops\Handler\PrettyPageHandler);
+    $whoops->register();
+
     // Create application instance.
     $app = new Application();
 
