@@ -3,10 +3,13 @@ declare(strict_types=1);
 
 namespace PhpCircle\Framework;
 
+use Exception;
 use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 use Illuminate\Container\Container;
+use PhpCircle\Framework\Exception\RouteNotFoundException;
 use PhpCircle\Framework\Routing\Router;
+use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\ServerRequestFactory;
 use function FastRoute\simpleDispatcher;
 
@@ -38,19 +41,35 @@ class Application extends Container
         $httpMethod = $request->getMethod();
         $uri = \trim($request->getUri()->getPath(), '/');
 
-        $handlerClass = $this->dispatch($httpMethod, $uri);
+        try {
+            $handlerClass = $this->dispatch($httpMethod, $uri);
 
-        /** @var \Psr\Http\Server\RequestHandlerInterface $handler */
-        $handler = $this->make($handlerClass);
+            /** @var \Psr\Http\Server\RequestHandlerInterface $handler */
+            $handler = $this->make($handlerClass);
 
-        /** @var \Psr\Http\Message\ResponseInterface $response */
-        $response = $handler->handle($request);
+            /** @var \Psr\Http\Message\ResponseInterface $response */
+            $response = $handler->handle($request);
 
-        // Do something with the response.
+            // Do something with the response.
 
-        echo $response->getBody();
+            echo $response->getBody();
+        } catch (Exception $exception) {
+            if ($exception instanceof RouteNotFoundException) {
+                // TODO: Create an error handler to return correct structure.
+                http_response_code($exception->getCode());
+                echo (new JsonResponse($exception->getMessage(), $exception->getCode()))->getBody();
+            }
+        }
     }
 
+    /**
+     * Dispatch
+     *
+     * @param string $method
+     * @param string $uri
+     *
+     * @return mixed
+     */
     private function dispatch(string $method, string $uri)
     {
         $dispatcher = simpleDispatcher(function (RouteCollector $routeCollector) {
@@ -64,7 +83,7 @@ class Application extends Container
 
         switch ($routeInfo[0]) {
             case Dispatcher::NOT_FOUND:
-                // ... 404 Not Found
+                throw new RouteNotFoundException('Route not found');
                 break;
             case Dispatcher::METHOD_NOT_ALLOWED:
                 $allowedMethods = $routeInfo[1];
