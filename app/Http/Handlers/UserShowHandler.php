@@ -8,12 +8,14 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\JsonResponse;
 
-class UserHandler implements RequestHandlerInterface
+class UserShowHandler implements RequestHandlerInterface
 {
     private $name;
 
     /**
      * Handles a request and produces a response.
+     *
+     * May call other collaborating code to generate the response.
      *
      * @param \Psr\Http\Message\ServerRequestInterface $request
      *
@@ -22,6 +24,7 @@ class UserHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         dump($request);
+
         $data = \json_decode((string)$request->getBody(), true);
 
         return new JsonResponse($data);
